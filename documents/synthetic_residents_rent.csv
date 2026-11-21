@@ -1,0 +1,13 @@
+nickname,room,rent_inr,due_date,paid_status
+Avi,G01,8500,2026-11-05,Paid
+Rohit,G02,6500,2026-11-05,Paid
+Sam,G03,10500,2026-11-05,Pending
+Kiran,G04,5800,2026-11-05,Paid
+Dev,G05,10800,2026-11-05,Overdue
+Manu,F101,11000,2026-11-05,Paid
+Arjun,F102,6700,2026-11-05,Pending
+Vik,F103,8800,2026-11-05,Paid
+Nikhil,F104,6000,2026-11-05,Paid
+Jay,F105,11500,2026-11-05,Overdue
+Sid,S201,11200,2026-11-05,Paid
+Hari,S202,6600,2026-11-05,Pending

@@ -1,0 +1,25 @@
+room_id,floor,sharing,AC,food_plan,amenities,rent_inr_per_bed_month,beds_free
+G01,Ground,2,No,Not included,Wi-Fi; wardrobe; attached bathroom,8500,1
+G02,Ground,3,No,Not included,Wi-Fi; wardrobe; shared bathroom,6500,2
+G03,Ground,2,Yes,Not included,Wi-Fi; wardrobe; attached bathroom; study desk,10500,0
+G04,Ground,4,No,Not included,Wi-Fi; wardrobe; shared bathroom,5800,1
+G05,Ground,2,Yes,Not included,Wi-Fi; wardrobe; attached bathroom,10800,1
+G06,Ground,3,No,Not included,Wi-Fi; wardrobe; study desk,6800,0
+F101,First,2,Yes,Not included,Wi-Fi; wardrobe; attached bathroom; study desk,11000,1
+F102,First,3,No,Not included,Wi-Fi; wardrobe; shared bathroom,6700,2
+F103,First,2,No,Not included,Wi-Fi; wardrobe; attached bathroom,8800,0
+F104,First,4,No,Not included,Wi-Fi; wardrobe; shared bathroom,6000,1
+F105,First,2,Yes,Not included,Wi-Fi; wardrobe; attached bathroom; balcony,11500,0
+F106,First,3,Yes,Not included,Wi-Fi; wardrobe; attached bathroom,9200,1
+F107,First,2,No,Not included,Wi-Fi; wardrobe; study desk,8200,2
+F108,First,4,No,Not included,Wi-Fi; wardrobe; shared bathroom,5900,0
+S201,Second,2,Yes,Not included,Wi-Fi; wardrobe; attached bathroom,11200,1
+S202,Second,3,No,Not included,Wi-Fi; wardrobe; shared bathroom,6600,1
+S203,Second,2,No,Not included,Wi-Fi; wardrobe; attached bathroom; study desk,8900,0
+S204,Second,4,No,Not included,Wi-Fi; wardrobe; shared bathroom,6100,2
+S205,Second,2,Yes,Not included,Wi-Fi; wardrobe; attached bathroom; balcony,11800,0
+S206,Second,3,Yes,Not included,Wi-Fi; wardrobe; attached bathroom,9400,1
+S207,Second,2,No,Not included,Wi-Fi; wardrobe; study desk,8400,1
+S208,Second,4,No,Not included,Wi-Fi; wardrobe; shared bathroom,6000,0
+T301,Third,2,Yes,Not included,Wi-Fi; wardrobe; attached bathroom,10900,1
+T302,Third,3,No,Not included,Wi-Fi; wardrobe; shared bathroom,6400,2
