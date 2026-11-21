@@ -1,9 +1,46 @@
 [theme]
-primaryColor = "#1B4F72"
-backgroundColor = "#F7F9FC"
-secondaryBackgroundColor = "#E8EEF5"
-textColor = "#1A2332"
+# Color psychology for Premium PG:
+# Teal = trust + calm (housing/hospitality)
+# Soft mist greens = comfort / “home”
+# Amber = attention (pending) without alarm
+# Forest green = success / paid
+# Soft coral = urgency (overdue/errors) without harsh panic red
+base = "light"
+primaryColor = "#0D7377"
+backgroundColor = "#F3F7F6"
+secondaryBackgroundColor = "#E4EEEC"
+textColor = "#1A2E2C"
+linkColor = "#0A5C5F"
+borderColor = "#C5D6D2"
+baseRadius = "0.55rem"
+showWidgetBorder = true
+showSidebarBorder = true
 font = "sans serif"
+headingFont = "sans serif"
+
+# Semantic palette (alerts, badges, markdown color shortcodes)
+blueColor = "#2F6F8F"
+blueBackgroundColor = "#D9EAF2"
+greenColor = "#2F7D4F"
+greenBackgroundColor = "#D9EEDF"
+orangeColor = "#C9852C"
+orangeBackgroundColor = "#F7E8CF"
+redColor = "#C45C4A"
+redBackgroundColor = "#F6DDD8"
+yellowColor = "#B89B2C"
+yellowBackgroundColor = "#F3EBC7"
+grayColor = "#5B6B68"
+grayBackgroundColor = "#E6EBEA"
+violetColor = "#3D6B6E"
+violetBackgroundColor = "#DCE8E7"
+
+[theme.sidebar]
+backgroundColor = "#0A4F52"
+secondaryBackgroundColor = "#0D7377"
+textColor = "#F3F7F6"
+primaryColor = "#7ED4C8"
+borderColor = "#1A6A6E"
+linkColor = "#B8EDE6"
 
 [server]
 headless = true

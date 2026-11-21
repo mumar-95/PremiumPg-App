@@ -22,10 +22,32 @@ from src.rooms import filter_rooms, free_beds_only, room_ids_with_free_beds
 
 st.set_page_config(
     page_title="Premium PG Assistant",
-    page_icon="🏠",
+    page_icon=":material/home:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+# Trust (teal) · Comfort (mist green) · Action (amber) · Alert (soft coral)
+STATUS_COLORS = {
+    "Paid": ("#2F7D4F", "#D9EEDF"),
+    "Pending": ("#C9852C", "#F7E8CF"),
+    "Overdue": ("#C45C4A", "#F6DDD8"),
+    "Open": ("#C9852C", "#F7E8CF"),
+    "In Progress": ("#2F6F8F", "#D9EAF2"),
+    "Closed": ("#2F7D4F", "#D9EEDF"),
+    "Low": ("#2F7D4F", "#D9EEDF"),
+    "Medium": ("#C9852C", "#F7E8CF"),
+    "High": ("#C45C4A", "#F6DDD8"),
+}
+
+
+def _status_badge(label: str) -> str:
+    fg, bg = STATUS_COLORS.get(label, ("#5B6B68", "#E6EBEA"))
+    return (
+        f'<span style="display:inline-block;padding:0.2rem 0.65rem;'
+        f"border-radius:999px;font-size:0.85rem;font-weight:600;"
+        f'color:{fg};background:{bg};border:1px solid {fg}33;">{label}</span>'
+    )
 
 
 def _init_session() -> None:
@@ -57,7 +79,7 @@ def _cached_vectorstore():
 
 
 def render_sidebar() -> None:
-    st.sidebar.title("Premium PG Assistant")
+    st.sidebar.markdown("### :material/home: Premium PG Assistant")
     st.sidebar.caption(
         "RAG-powered help for visitors and residents. "
         "Policy answers cite handbook sections."
@@ -70,6 +92,14 @@ def render_sidebar() -> None:
 - We never ask for government ID proofs or numbers
 """
     )
+    with st.sidebar.expander("Color psychology", expanded=False):
+        st.caption(
+            "**Teal** — trust & calm for housing decisions  \n"
+            "**Mist green** — comfort / home atmosphere  \n"
+            "**Amber** — pending attention, not panic  \n"
+            "**Forest green** — paid / resolved success  \n"
+            "**Soft coral** — overdue / high priority alerts"
+        )
     key_ok = bool(get_groq_api_key())
     st.sidebar.markdown(
         f"**Groq API:** {'configured' if key_ok else 'missing — set GROQ_API_KEY'}"
@@ -79,13 +109,14 @@ def render_sidebar() -> None:
 
     st.sidebar.info(
         "Bookings, complaints, and chat history are session-only "
-        "and clear when you refresh."
+        "and clear when you refresh.",
+        icon=":material/info:",
     )
 
 
 def tab_find_room(rooms: pd.DataFrame) -> None:
-    st.subheader("Find a Room")
-    st.caption("Only rooms with free beds are listed.")
+    st.subheader(":material/search: Find a room")
+    st.caption("Only rooms with free beds are listed — calm teal cues signal availability & trust.")
 
     amenities_opts = list_amenity_options(rooms)
     food_opts = sorted(rooms["food_plan"].dropna().unique().tolist())
@@ -151,22 +182,23 @@ def tab_find_room(rooms: pd.DataFrame) -> None:
             "beds_free": "Free beds",
         }
     )
-    st.dataframe(display, use_container_width=True, hide_index=True)
+    st.dataframe(display, width="stretch", hide_index=True, alt="Available rooms matching filters")
 
     st.markdown("#### Request a room")
     pick = st.selectbox("Select room to request", options=filtered["room_id"].tolist())
-    if st.button("Continue to Booking", type="primary"):
+    if st.button("Continue to booking", type="primary", icon=":material/arrow_forward:"):
         st.session_state.prefill_room_id = pick
         st.success(
-            f"Room **{pick}** selected. Open the **Booking Request** tab to submit."
+            f"Room **{pick}** selected. Open the **Booking request** tab to submit.",
+            icon=":material/check_circle:",
         )
 
 
 def tab_booking(rooms: pd.DataFrame) -> None:
-    st.subheader("Booking Request")
+    st.subheader(":material/event_available: Booking request")
     st.caption(
         "Submit a move-in request with test contact details. "
-        "Status starts as Pending. Do not enter government ID numbers."
+        "Status starts as Pending (amber = needs attention). Do not enter government ID numbers."
     )
 
     free_ids = room_ids_with_free_beds(rooms)
@@ -203,22 +235,31 @@ def tab_booking(rooms: pd.DataFrame) -> None:
             st.session_state.prefill_room_id = None
             st.success(
                 f"Request **{booking['request_id']}** created with status "
-                f"**{booking['status']}**."
+                f"**{booking['status']}**.",
+                icon=":material/check_circle:",
             )
 
     st.markdown("#### Your session requests")
     if not st.session_state.bookings:
-        st.info("No booking requests in this session yet.")
+        st.info("No booking requests in this session yet.", icon=":material/info:")
     else:
+        rows = bookings_for_display(st.session_state.bookings)
         st.dataframe(
-            pd.DataFrame(bookings_for_display(st.session_state.bookings)),
-            use_container_width=True,
+            pd.DataFrame(rows),
+            width="stretch",
             hide_index=True,
+            alt="Session booking requests",
         )
+        for row in rows:
+            st.markdown(
+                f"**{row['request_id']}** · Room {row['room_id']} · "
+                f"{_status_badge(row['status'])}",
+                unsafe_allow_html=True,
+            )
 
 
 def tab_my_rent(residents: pd.DataFrame) -> None:
-    st.subheader("My Rent (Residents)")
+    st.subheader(":material/payments: My rent")
     st.caption(
         "Look up **only your own** rent record with nickname + room. "
         "Other residents’ details are never shown."
@@ -247,23 +288,33 @@ def tab_my_rent(residents: pd.DataFrame) -> None:
     record = st.session_state.get("resident_lookup")
     if record:
         status = record["paid_status"]
-        color = {"Paid": "green", "Pending": "orange", "Overdue": "red"}.get(
-            status, "gray"
-        )
-        st.markdown(
+        fg, bg = STATUS_COLORS.get(status, ("#5B6B68", "#E6EBEA"))
+        st.html(
             f"""
-| Field | Value |
-|-------|-------|
-| Nickname | {record['nickname']} |
-| Room | {record['room']} |
-| Rent (₹) | {record['rent_inr']} |
-| Due date | {record['due_date']} |
-| Status | :{color}[**{status}**] |
-"""
+            <div style="padding:1.1rem 1.25rem;border-radius:0.75rem;
+                        background:{bg};border:1px solid {fg}44;margin:0.5rem 0 1rem;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+                <div>
+                  <div style="font-size:0.85rem;color:#5B6B68;">Your rent record</div>
+                  <div style="font-size:1.35rem;font-weight:700;color:#1A2E2C;">
+                    {record['nickname']} · Room {record['room']}
+                  </div>
+                </div>
+                {_status_badge(status)}
+              </div>
+              <div style="margin-top:0.9rem;display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                <div><div style="color:#5B6B68;font-size:0.8rem;">Rent</div>
+                     <div style="font-weight:600;">₹{record['rent_inr']}</div></div>
+                <div><div style="color:#5B6B68;font-size:0.8rem;">Due date</div>
+                     <div style="font-weight:600;">{record['due_date']}</div></div>
+              </div>
+            </div>
+            """
         )
         st.info(
             "For disputes or payment proof, contact the PG manager. "
-            "Never share government ID numbers in this app."
+            "Never share government ID numbers in this app.",
+            icon=":material/privacy_tip:",
         )
 
     with st.expander("Demo tip"):
@@ -274,7 +325,7 @@ def tab_my_rent(residents: pd.DataFrame) -> None:
 
 
 def tab_policy_chat() -> None:
-    st.subheader("Policy / FAQ Chat")
+    st.subheader(":material/menu_book: Policy / FAQ chat")
     st.caption(
         "Answers come from the PG Resident Policy with section citations. "
         "Uncovered questions are referred to the PG manager."
@@ -332,8 +383,11 @@ def tab_policy_chat() -> None:
 
 
 def tab_complaints() -> None:
-    st.subheader("Complaint Ticket")
-    st.caption("Raise a ticket with category, priority, and description.")
+    st.subheader(":material/report: Complaint ticket")
+    st.caption(
+        "Raise a ticket with category, priority, and description. "
+        "High priority uses soft coral — clear urgency without harsh alarm."
+    )
 
     with st.form("complaint_form", clear_on_submit=True):
         category = st.selectbox("Category", options=CATEGORIES)
@@ -352,19 +406,27 @@ def tab_complaints() -> None:
             )
             st.session_state.complaints.append(ticket)
             st.success(
-                f"Ticket **{ticket['ticket_id']}** opened with status **{ticket['status']}**."
+                f"Ticket **{ticket['ticket_id']}** opened with status **{ticket['status']}**.",
+                icon=":material/check_circle:",
             )
 
     st.markdown("#### Your session tickets")
     if not st.session_state.complaints:
-        st.info("No complaint tickets in this session yet.")
+        st.info("No complaint tickets in this session yet.", icon=":material/info:")
         return
 
     for i, ticket in enumerate(st.session_state.complaints):
         with st.container(border=True):
             c1, c2, c3 = st.columns([2, 2, 2])
-            c1.markdown(f"**{ticket['ticket_id']}** · {ticket['category']}")
-            c2.markdown(f"Priority: **{ticket['priority']}**")
+            c1.markdown(
+                f"**{ticket['ticket_id']}** · {ticket['category']}  \n"
+                f"{_status_badge(ticket['status'])}",
+                unsafe_allow_html=True,
+            )
+            c2.markdown(
+                f"Priority  \n{_status_badge(ticket['priority'])}",
+                unsafe_allow_html=True,
+            )
             new_status = c3.selectbox(
                 "Status",
                 options=STATUSES,
@@ -381,10 +443,23 @@ def main() -> None:
     _init_session()
     render_sidebar()
 
-    st.title("Premium PG Assistant")
-    st.write(
-        "Room search, booking requests, policy Q&A with citations, "
-        "resident rent self-lookup, and complaint tickets."
+    st.html(
+        """
+        <div style="
+            margin:0 0 1.25rem 0;padding:1.35rem 1.5rem;border-radius:0.9rem;
+            background:linear-gradient(120deg,#0A4F52 0%,#0D7377 45%,#3A9B8F 100%);
+            color:#F3F7F6;box-shadow:0 8px 24px rgba(10,79,82,0.18);">
+          <div style="font-size:0.8rem;letter-spacing:0.06em;text-transform:uppercase;
+                      opacity:0.85;margin-bottom:0.35rem;">Premium PG Assistant</div>
+          <div style="font-size:1.75rem;font-weight:700;line-height:1.2;margin-bottom:0.4rem;">
+            Feel at home — decide with clarity
+          </div>
+          <div style="opacity:0.92;max-width:42rem;font-size:1rem;">
+            Teal builds trust for room seekers; soft greens keep the space calm for residents.
+            Policy answers stay grounded, private, and citation-backed.
+          </div>
+        </div>
+        """
     )
 
     rooms = _cached_rooms()
